@@ -1,31 +1,28 @@
 import streamlit as st
-import sqlite3
-from datetime import datetime
 
-# --- DBMS CONNECTION ---
-conn = sqlite3.connect('abc_parking.db', check_same_thread=False)
-c = conn.cursor()
-c.execute("CREATE TABLE IF NOT EXISTS parked (vehicle_no TEXT PRIMARY KEY, type TEXT, owner TEXT, department TEXT, entry_time TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS history (vehicle_no TEXT, type TEXT, owner TEXT, department TEXT, entry_time TEXT, exit_time TEXT, fee INTEGER, status TEXT)")
-conn.commit()
+st.title("Vehicle Parking Management System")
+st.write("Only Frontend - DBMS Project")
 
-st.set_page_config(page_title="ABC College Parking", page_icon="🎓")
-st.title("🎓 ABC College")
-st.subheader("Vehicle Parking Management System (DBMS Project)")
+# Temporary list bina database ke
+if 'parked_list' not in st.session_state:
+    st.session_state.parked_list = []
 
-menu = ["Park Vehicle", "View Parked", "Remove Vehicle", "History", "About Project"]
-choice = st.sidebar.selectbox("Menu", menu)
+vehicle_no = st.text_input("Gaadi Number Daalo (MH31...)")
+owner_name = st.text_input("Owner Name")
 
-if choice == "Park Vehicle":
-    st.header("Park Vehicle - ABC College")
-    no = st.text_input("Vehicle Number (e.g. MH27 AB1234)").upper()
-    v_type = st.selectbox("Vehicle Type", ["Bike", "Car", "Scooty", "Faculty Car"])
-    owner = st.text_input("Student / Faculty Name")
-    dept = st.selectbox("Department", ["CSE", "ENTC", "Mechanical", "Civil", "Faculty", "Visitor"])
-    if st.button("Park Vehicle"):
-        if no and owner:
-            try:
-                entry = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                c.execute("INSERT INTO parked VALUES (?,?,?,?,?)", (no, v_type, owner, dept, entry))
-                conn.commit()
-                st.success(f"Park Ho Gayi! {no} |
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("Park Karo"):
+        if vehicle_no != "":
+            st.session_state.parked_list.append(vehicle_no)
+            st.success("Park Ho Gayi!")
+        else:
+            st.error("Pehle Gaadi Number Daalo")
+
+with col2:
+    if st.button("Saari Gaadiya Dikhao"):
+        st.write(st.session_state.parked_list)
+
+st.write("---")
+st.write("Total Parked:", len(st.session_state.parked_list))
